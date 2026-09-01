@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Ambassador Dashboard</title>
+<style>
+  :root {
+    --bg: #1a1a1a;
+    --card: #242424;
+    --border: #3a3a3a;
+    --text: #eee;
+    --muted: #999;
+    --accent: #c8935a;
+    --green: #4caf50;
+    --red: #e05555;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ---- Login screen ---- */
+  #loginScreen {
+    max-width: 360px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  #loginScreen h1 { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
+  #loginScreen input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  #loginScreen button {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    background: var(--accent);
+    color: #1a1a1a;
+    cursor: pointer;
+  }
+  #loginScreen button:disabled { opacity: .5; cursor: not-allowed; }
+  #loginError { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+  /* ---- Dashboard ---- */
+  #dashboard { display: none; }
+  .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+  .header h1 { font-size: 22px; margin: 0; }
+  .asOf { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
+  .logout { color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; background: none; border: none; }
+
+  .summaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .statCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .statCard .num { font-size: 26px; font-weight: 700; }
+  .statCard .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .statCard.positive .num { color: var(--green); }
+  .statCard.negative .num { color: var(--red); }
+
+  .sectionTitle { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 24px 0 10px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px; border-bottom: 1px solid var(--border); }
+  tr.active-row { background: rgba(76,175,80,0.07); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge.active { background: rgba(76,175,80,0.18); color: var(--green); }
+  .badge.inactive { background: rgba(224,85,85,0.14); color: var(--red); }
+  .badge.retained { background: rgba(200,147,90,0.18); color: var(--accent); margin-left: 4px; }
+  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .footnote { color: var(--muted); font-size: 12px; margin-top: 30px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h1>Ambassador Dashboard</h1>
+  <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn" onclick="login()">View My Dashboard</button>
+  <div id="loginError"></div>
+</div>
+
+<div id="dashboard" class="wrap">
+  <div class="header">
+    <h1 id="repName">—</h1>
+    <button class="logout" onclick="logout()">Log out</button>
+  </div>
+  <div class="asOf" id="asOf"></div>
+
+  <div class="summaryGrid" id="summaryGrid"></div>
+
+  <div class="sectionTitle">Your Accounts</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th class="num-cell">This Year</th>
+        <th class="num-cell">Orders</th>
+        <th class="num-cell">Last Year</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="accountsBody"></tbody>
+  </table>
+
+  <div class="footnote">
+    Active = 3+ orders and $2,000+ this year, or $5,000+ outright.
+    Retained = active both this year and last year.
+    Figures refresh automatically overnight — "as of" above shows the last refresh.
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // SET THIS to your deployed Apps Script Web App URL before publishing.
+  // Apps Script → Deploy → New deployment → Web app → copy the URL here.
+  // ============================================================
+  const BONUS_API_URL = 'https://script.google.com/macros/s/AKfycbxASoL1GWohgiY3s61xtTf6BU18eseCZS1UD9Ch8VmDo0JMU6rblP16ao4xeKUjDLSGyA/exec';
+
+  function money(n) {
+    return '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function login() {
+    const pw = document.getElementById('passwordInput').value;
+    const btn = document.getElementById('loginBtn');
+    const errEl = document.getElementById('loginError');
+    if (!pw) { errEl.textContent = 'Enter your password.'; return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
+    errEl.textContent = '';
+
+    fetch(BONUS_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ password: pw })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (resp) {
+        btn.disabled = false;
+        btn.textContent = 'View My Dashboard';
+        if (resp.error) {
+          errEl.textContent = resp.error;
+          return;
+        }
+        renderDashboard(resp.rep, resp.data);
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = 'View My Dashboard';
+        errEl.textContent = 'Could not reach the server. Try again.';
+      });
+  }
+
+  document.getElementById('passwordInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') login();
+  });
+
+  function renderDashboard(rep, data) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('repName').textContent = rep + '\u2019s Dashboard';
+    document.getElementById('asOf').textContent = 'As of ' + data.asOf;
+
+    const s = data.summary;
+    const netNewClass = s.netNew > 0 ? 'positive' : (s.netNew < 0 ? 'negative' : '');
+    document.getElementById('summaryGrid').innerHTML =
+      statCard(s.currentActiveCount, 'Active Accounts') +
+      statCard(s.priorActiveCount, 'Active Last Year') +
+      statCard(s.retainedCount, 'Retained') +
+      statCard((s.netNew > 0 ? '+' : '') + s.netNew, 'Net New', netNewClass) +
+      statCard(s.retentionRatePct + '%', 'Retention Rate');
+
+    const rows = data.accounts.map(function (a) {
+      const statusBadge = a.active
+        ? '<span class="badge active">Active</span>' + (a.retained ? '<span class="badge retained">Retained</span>' : '')
+        : '<span class="badge inactive">Not Active</span>';
+      return '<tr class="' + (a.active ? 'active-row' : '') + '">' +
+        '<td>' + escapeHtml(a.name) + '</td>' +
+        '<td class="num-cell">' + money(a.thisYearDollars) + '</td>' +
+        '<td class="num-cell">' + a.thisYearOrders + '</td>' +
+        '<td class="num-cell">' + money(a.lastYearDollars) + '</td>' +
+        '<td>' + statusBadge + '</td>' +
+        '</tr>';
+    }).join('');
+    document.getElementById('accountsBody').innerHTML = rows || '<tr><td colspan="5">No accounts found.</td></tr>';
+  }
+
+  function statCard(num, label, extraClass) {
+    return '<div class="statCard ' + (extraClass || '') + '"><div class="num">' + num + '</div><div class="label">' + label + '</div></div>';
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function logout() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginError').textContent = '';
+  }
+</script>
+
+</body>
+</html>
