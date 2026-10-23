@@ -9,11 +9,13 @@
   :root {
     --bg: #1a1a1a;
     --card: #242424;
+    --card2: #2c2c2c;
     --border: #3a3a3a;
     --text: #eee;
     --muted: #999;
     --accent: #c8935a;
     --green: #4caf50;
+    --amber: #e0a43a;
     --red: #e05555;
   }
   * { box-sizing: border-box; }
@@ -27,32 +29,15 @@
   .wrap { max-width: 760px; margin: 0 auto; }
 
   /* ---- Login screen ---- */
-  #loginScreen {
-    max-width: 360px;
-    margin: 80px auto;
-    text-align: center;
-  }
+  #loginScreen { max-width: 360px; margin: 80px auto; text-align: center; }
   #loginScreen h1 { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
   #loginScreen input {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--card);
-    color: var(--text);
-    margin-bottom: 12px;
+    width: 100%; padding: 12px 14px; font-size: 16px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text); margin-bottom: 12px;
   }
   #loginScreen button {
-    width: 100%;
-    padding: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
-    background: var(--accent);
-    color: #1a1a1a;
-    cursor: pointer;
+    width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 8px;
+    border: none; background: var(--accent); color: #1a1a1a; cursor: pointer;
   }
   #loginScreen button:disabled { opacity: .5; cursor: not-allowed; }
   #loginError { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 18px; }
@@ -61,38 +46,45 @@
   #dashboard { display: none; }
   .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
   .header h1 { font-size: 22px; margin: 0; }
-  .asOf { color: var(--muted); font-size: 12px; margin-bottom: 24px; }
+  .asOf { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
   .logout { color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; background: none; border: none; }
 
-  .summaryGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .statCard {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-  }
-  .statCard .num { font-size: 26px; font-weight: 700; }
-  .statCard .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .statCard.positive .num { color: var(--green); }
-  .statCard.negative .num { color: var(--red); }
+  .totalCard { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
+  .totalCard .label { font-size: 13px; color: var(--muted); }
+  .totalCard .num { font-size: 32px; font-weight: 700; margin: 4px 0; }
+  .totalCard .sub { font-size: 12px; color: var(--muted); }
 
-  .sectionTitle { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 24px 0 10px; }
+  .legGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .leg { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .legTop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .legTitle { font-size: 14px; font-weight: 600; }
+  .pill { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 12px; white-space: nowrap; }
+  .pill.done { background: rgba(76,175,80,0.18); color: var(--green); }
+  .pill.going { background: rgba(224,164,58,0.18); color: var(--amber); }
+  .pill.wait { background: rgba(153,153,153,0.18); color: var(--muted); }
+  .bar { height: 8px; background: var(--card2); border-radius: 4px; overflow: hidden; margin: 12px 0 10px; }
+  .bar > div { height: 100%; border-radius: 4px; }
+  .legAmt { font-size: 24px; font-weight: 700; }
+  .legLine { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.45; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); }
-  td { padding: 10px; border-bottom: 1px solid var(--border); }
-  tr.active-row { background: rgba(76,175,80,0.07); }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-  .badge.active { background: rgba(76,175,80,0.18); color: var(--green); }
-  .badge.inactive { background: rgba(224,85,85,0.14); color: var(--red); }
-  .badge.retained { background: rgba(200,147,90,0.18); color: var(--accent); margin-left: 4px; }
-  .num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+  details.panel { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0 16px; margin-bottom: 24px; }
+  details.panel summary { cursor: pointer; padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--accent); }
+  .calc { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-bottom: 8px; }
+  .calc td { padding: 8px 0; border-top: 1px solid var(--border); vertical-align: top; }
+  .calc td.amt { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: 12px; }
+  .calc tr.strong td { font-weight: 700; }
+  .calc .note { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .panelNote { font-size: 12px; color: var(--muted); line-height: 1.5; padding-bottom: 14px; }
+
+  .sectionTitle { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 26px 0 4px; }
+  .groupHint { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+  .acct { display: flex; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .acct .right { color: var(--muted); font-size: 13px; text-align: right; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 6px; }
+  .badge.retained { background: rgba(200,147,90,0.18); color: var(--accent); }
+  .badge.new { background: rgba(76,175,80,0.18); color: var(--green); }
+  .empty { font-size: 13px; color: var(--muted); padding: 8px 2px; }
+  details.others summary { cursor: pointer; font-size: 13px; color: var(--muted); padding: 12px 2px; }
 
   .footnote { color: var(--muted); font-size: 12px; margin-top: 30px; line-height: 1.5; }
 </style>
@@ -113,39 +105,45 @@
   </div>
   <div class="asOf" id="asOf"></div>
 
-  <div class="summaryGrid" id="summaryGrid"></div>
+  <div class="totalCard">
+    <div class="label">2026 bonus standing today</div>
+    <div class="num" id="totalNum">—</div>
+    <div class="sub" id="totalSub"></div>
+  </div>
 
-  <div class="sectionTitle">Your Accounts</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Account</th>
-        <th class="num-cell">This Year</th>
-        <th class="num-cell">Orders</th>
-        <th class="num-cell">Last Year</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody id="accountsBody"></tbody>
-  </table>
+  <div class="legGrid" id="legGrid"></div>
+
+  <details class="panel">
+    <summary>How your floor is set</summary>
+    <table class="calc" id="floorTable"></table>
+    <div class="panelNote">
+      Your floor is the point where your sales cover the cost of your role. Expenses are estimated for the months
+      not yet entered and trued to actuals in January: lower actual expenses lower your floor. Every input moves
+      with the live numbers, so this can shift a little from night to night.
+    </div>
+  </details>
+
+  <div id="accountGroups"></div>
 
   <div class="footnote">
-    Active = 3+ orders and $2,000+ this year, or $5,000+ outright.
-    Retained = active both this year and last year.
-    Figures refresh automatically overnight — "as of" above shows the last refresh.
+    Active = 3+ orders and $2,000+ this year, or $5,000+ on dollars alone. Retained = active in 2025 and again in 2026.
+    LCBO-routed sales count at 50¢ on the dollar toward Leg 1 and in full for the active test. Event sales sit outside
+    Leg 1, and their margin lowers your floor instead. Figures refresh every night; "updated" above shows the last refresh.
+    Everything settles at the January true-up.
   </div>
 </div>
 
 <script>
-  // ============================================================
-  // SET THIS to your deployed Apps Script Web App URL before publishing.
-  // Apps Script → Deploy → New deployment → Web app → copy the URL here.
-  // ============================================================
+  // Apps Script Web App URL (Deploy → Manage deployments). Unchanged from the previous version.
   const BONUS_API_URL = 'https://script.google.com/macros/s/AKfycbxASoL1GWohgiY3s61xtTf6BU18eseCZS1UD9Ch8VmDo0JMU6rblP16ao4xeKUjDLSGyA/exec';
 
-  function money(n) {
-    return '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  function money(n, cents) {
+    const v = Number(n) || 0;
+    const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: cents ? 2 : 0, maximumFractionDigits: cents ? 2 : 0 });
+    return (v < 0 ? '−$' : '$') + s;
   }
+  function pct(n) { return (Math.round((Number(n) || 0) * 1000) / 10) + '%'; }
+  function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
 
   function login() {
     const pw = document.getElementById('passwordInput').value;
@@ -157,21 +155,15 @@
     btn.textContent = 'Checking...';
     errEl.textContent = '';
 
-    fetch(BONUS_API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ password: pw })
-    })
+    fetch(BONUS_API_URL, { method: 'POST', body: JSON.stringify({ password: pw }) })
       .then(function (r) { return r.json(); })
       .then(function (resp) {
         btn.disabled = false;
         btn.textContent = 'View My Dashboard';
-        if (resp.error) {
-          errEl.textContent = resp.error;
-          return;
-        }
+        if (resp.error) { errEl.textContent = resp.error; return; }
         renderDashboard(resp.rep, resp.data);
       })
-      .catch(function (err) {
+      .catch(function () {
         btn.disabled = false;
         btn.textContent = 'View My Dashboard';
         errEl.textContent = 'Could not reach the server. Try again.';
@@ -182,44 +174,132 @@
     if (e.key === 'Enter') login();
   });
 
-  function renderDashboard(rep, data) {
+  function renderDashboard(rep, d) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('repName').textContent = rep + '\u2019s Dashboard';
-    document.getElementById('asOf').textContent = 'As of ' + data.asOf;
+    document.getElementById('repName').textContent = rep + '’s Dashboard';
+    document.getElementById('asOf').textContent = 'Updated ' + d.asOf;
 
-    const s = data.summary;
-    const netNewClass = s.netNew > 0 ? 'positive' : (s.netNew < 0 ? 'negative' : '');
-    document.getElementById('summaryGrid').innerHTML =
-      statCard(s.currentActiveCount, 'Active Accounts') +
-      statCard(s.priorActiveCount, 'Active Last Year') +
-      statCard(s.retainedCount, 'Retained') +
-      statCard((s.netNew > 0 ? '+' : '') + s.netNew, 'Net New', netNewClass) +
-      statCard(s.retentionRatePct + '%', 'Retention Rate');
+    document.getElementById('totalNum').textContent = money(d.total);
+    document.getElementById('totalSub').textContent = 'Settled at the January true-up. Sales gate for Legs 2 and 3 (' +
+      pct(d.gate.pct) + ' of your floor, ' + money(d.gate.amount) + '): ' + (d.gate.met ? 'met' : 'not met yet');
 
-    const rows = data.accounts.map(function (a) {
-      const statusBadge = a.active
-        ? '<span class="badge active">Active</span>' + (a.retained ? '<span class="badge retained">Retained</span>' : '')
-        : '<span class="badge inactive">Not Active</span>';
-      return '<tr class="' + (a.active ? 'active-row' : '') + '">' +
-        '<td>' + escapeHtml(a.name) + '</td>' +
-        '<td class="num-cell">' + money(a.thisYearDollars) + '</td>' +
-        '<td class="num-cell">' + a.thisYearOrders + '</td>' +
-        '<td class="num-cell">' + money(a.lastYearDollars) + '</td>' +
-        '<td>' + statusBadge + '</td>' +
-        '</tr>';
-    }).join('');
-    document.getElementById('accountsBody').innerHTML = rows || '<tr><td colspan="5">No accounts found.</td></tr>';
+    document.getElementById('legGrid').innerHTML = leg1Card(d) + leg2Card(d) + leg3Card(d);
+    document.getElementById('floorTable').innerHTML = floorRows(d.floor);
+    document.getElementById('accountGroups').innerHTML = accountSections(d.groups);
   }
 
-  function statCard(num, label, extraClass) {
-    return '<div class="statCard ' + (extraClass || '') + '"><div class="num">' + num + '</div><div class="label">' + label + '</div></div>';
+  function legCard(title, pillClass, pillText, fill, color, amount, lines) {
+    const w = Math.max(0, Math.min(100, Math.round(fill * 100)));
+    return '<div class="leg"><div class="legTop"><span class="legTitle">' + title + '</span>' +
+      '<span class="pill ' + pillClass + '">' + pillText + '</span></div>' +
+      '<div class="bar"><div style="width:' + w + '%;background:' + color + '"></div></div>' +
+      '<div class="legAmt">' + amount + '</div>' +
+      lines.map(function (l) { return '<div class="legLine">' + l + '</div>'; }).join('') + '</div>';
   }
 
-  function escapeHtml(s) {
-    const div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
+  function leg1Card(d) {
+    const L = d.leg1, F = d.floor;
+    const per10k = money(10000 * L.rate);
+    if (L.remaining > 0) {
+      return legCard('Leg 1 · Sales', 'going', 'In progress', F.floor ? L.qualifying / F.floor : 0, 'var(--amber)',
+        money(L.remaining) + ' to go',
+        [money(L.qualifying) + ' qualifying sales of your ' + money(F.floor) + ' floor.',
+         'Once you cross it, every $10,000 more pays ' + per10k + '.']);
+    }
+    return legCard('Leg 1 · Sales', 'done', 'Unlocked', 1, 'var(--green)', money(L.earned),
+      [money(L.qualifying) + ' qualifying sales vs your ' + money(F.floor) + ' floor, at ' + pct(L.rate) + '.',
+       'Uncapped: every $10,000 more pays ' + per10k + '.']);
+  }
+
+  function leg2Card(d) {
+    const L = d.leg2;
+    const fill = L.bar ? Math.min(1, L.count / L.bar) : 0;
+    const perAct = L.bar ? L.max / L.bar : 0;
+    const lines = [L.count + ' of ' + L.bar + ' activations logged.'];
+    if (!d.gate.met) {
+      lines.push(money(L.paid, true) + ' already paid. The rest of this leg starts counting once your sales pass ' + money(d.gate.amount) + '.');
+      return legCard('Leg 2 · Education', 'wait', 'Waiting on sales gate', fill, 'var(--muted)', money(L.paid, true) + ' paid', lines);
+    }
+    if (L.earned < L.paid) {
+      const need = perAct ? Math.ceil(L.paid / perAct) - L.count : 0;
+      lines.push(money(L.paid, true) + ' already paid. ' + need + ' more activations before the January balance starts building.');
+      return legCard('Leg 2 · Education', 'going', 'In progress', fill, 'var(--amber)', money(L.paid, true) + ' paid', lines);
+    }
+    lines.push(money(L.paid, true) + ' paid with October payroll, ' + money(L.balance, true) + ' in January.');
+    if (L.count >= L.bar) return legCard('Leg 2 · Education', 'done', 'Complete', 1, 'var(--green)', money(L.earned), lines);
+    return legCard('Leg 2 · Education', 'going', 'In progress', fill, 'var(--amber)', money(L.earned), lines);
+  }
+
+  function leg3Card(d) {
+    const L = d.leg3;
+    const net = (L.netNew > 0 ? '+' : '') + L.netNew;
+    const lines = [L.active + ' active accounts, net ' + net + ' over 2025’s ' + L.base + ' → ' + money(L.newComp) + '.'];
+    let next;
+    if (L.retRate >= L.tier2) next = 'Retained ' + L.retained + ' of ' + L.base + ' (' + pct(L.retRate) + '). Top retention tier reached.';
+    else {
+      const tier = L.retRate >= L.tier1 ? L.tier2 : L.tier1;
+      const bonus = L.retRate >= L.tier1 ? L.tier2Bonus : L.tier1Bonus;
+      const need = Math.max(0, Math.ceil(tier * L.base - 1e-9) - L.retained);
+      next = 'Retained ' + L.retained + ' of ' + L.base + ' (' + pct(L.retRate) + '). ' + need + ' more win-back' + (need === 1 ? '' : 's') + ' for ' + money(bonus) + '.';
+    }
+    lines.push(next);
+    if (!d.gate.met) return legCard('Leg 3 · Growth', 'wait', 'Waiting on sales gate', L.tier2 ? L.retRate / L.tier2 : 0, 'var(--muted)', money(0), lines);
+    const maxed = L.newComp >= L.newCap && L.retComp >= L.tier2Bonus;
+    const fill = L.tier2 ? Math.min(1, L.retRate / L.tier2) : 0;
+    if (maxed) return legCard('Leg 3 · Growth', 'done', 'Complete', 1, 'var(--green)', money(L.earned), lines);
+    return legCard('Leg 3 · Growth', L.earned > 0 ? 'done' : 'going', L.earned > 0 ? 'Earning' : 'In progress',
+      fill, L.earned > 0 ? 'var(--green)' : 'var(--amber)', money(L.earned), lines);
+  }
+
+  function floorRows(F) {
+    const months = F.monthsEntered;
+    let expNote = money(F.expEntered) + ' actual over ' + months + ' month' + (months === 1 ? '' : 's');
+    if (months < 12) expNote += ', ' + money(F.expEstimate) + ' estimated for the other ' + (12 - months);
+    if (F.vehicle) expNote += ', vehicle ' + money(F.vehicle);
+    if (F.expAdj) expNote += ', adjustments ' + money(F.expAdj);
+    const evNote = pct(F.gmWine) + ' of ' + money(F.evWine) + ' wine and ' + pct(F.gmSpirit) + ' of ' + money(F.evSpirit) + ' spirits sold at your events';
+
+    const row = function (label, amt, note, strong) {
+      return '<tr' + (strong ? ' class="strong"' : '') + '><td>' + label + (note ? '<span class="note">' + note + '</span>' : '') +
+        '</td><td class="amt">' + amt + '</td></tr>';
+    };
+    return row('Base salary', money(F.salary)) +
+      row('Less: education and marketing allocation (' + pct(F.eduPct) + ')', '(' + money(F.salary - F.salaryAttr) + ')') +
+      row('Salary attributed to the sales role', money(F.salaryAttr)) +
+      row('Plus: expenses for the year', money(F.expFull), expNote) +
+      row('Less: margin credit on your event sales', '(' + money(F.eventCredit) + ')', evNote) +
+      row('Cost of the role to cover', money(F.cost), '', true) +
+      row('÷ blended gross margin at your wine/spirits mix', pct(F.margin)) +
+      row('= Your floor', money(F.floor), '', true);
+  }
+
+  function acctRow(a, kind) {
+    let left = escapeHtml(a.name);
+    if (kind === 'counting' && a.retained) left += '<span class="badge retained">Retained</span>';
+    if (kind === 'counting' && a.isNew) left += '<span class="badge new">New</span>';
+    let right;
+    if (kind === 'winback') right = '2025: ' + money(a.lastDollars) + ' · ' + escapeHtml(a.needs);
+    else if (kind === 'almost') right = money(a.dollars) + ' so far · ' + escapeHtml(a.needs);
+    else right = money(a.dollars) + ' · ' + a.orders + ' order' + (a.orders === 1 ? '' : 's');
+    if (a.since) right += ' · counting from ' + escapeHtml(a.since);
+    return '<div class="acct"><span>' + left + '</span><span class="right">' + right + '</span></div>';
+  }
+
+  function group(title, hint, list, kind) {
+    return '<div class="sectionTitle">' + title + ' (' + list.length + ')</div><div class="groupHint">' + hint + '</div>' +
+      (list.length ? list.map(function (a) { return acctRow(a, kind); }).join('') : '<div class="empty">None right now.</div>');
+  }
+
+  function accountSections(g) {
+    let html = group('Win back', 'Active last year, not yet this year. Each one moves net new and retention together.', g.winback, 'winback') +
+      group('Almost active', 'One small push from counting.', g.almost, 'almost') +
+      group('Counting toward your bonus', 'Active this year.', g.counting, 'counting');
+    if (g.other.length) {
+      html += '<details class="others"><summary>Other accounts (' + g.other.length + ')</summary>' +
+        g.other.map(function (a) { return acctRow(a, 'other'); }).join('') + '</details>';
+    }
+    return html;
   }
 
   function logout() {
