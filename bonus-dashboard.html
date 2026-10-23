@@ -257,7 +257,7 @@
     let expNote = money(F.expEntered) + ' actual over ' + months + ' month' + (months === 1 ? '' : 's');
     if (months < 12) expNote += ', ' + money(F.expEstimate) + ' estimated for the other ' + (12 - months);
     if (F.vehicle) expNote += ', vehicle ' + money(F.vehicle);
-    if (F.expAdj) expNote += ', adjustments ' + money(F.expAdj);
+    if (F.expAdj) expNote += ', less ' + money(F.expAdj) + ' exempt (repaid errands, not sales costs)';
     const evNote = pct(F.gmWine) + ' of ' + money(F.evWine) + ' wine and ' + pct(F.gmSpirit) + ' of ' + money(F.evSpirit) + ' spirits sold at your events';
 
     const row = function (label, amt, note, strong) {
