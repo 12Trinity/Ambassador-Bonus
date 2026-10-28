@@ -44,6 +44,20 @@
 
   /* ---- Dashboard ---- */
   #dashboard { display: none; }
+
+  /* ---- Admin overview ---- */
+  #adminView { display: none; }
+  .backLink { display: none; background: none; border: none; color: var(--accent); font-size: 13px; cursor: pointer; padding: 0; margin-bottom: 12px; }
+  .adminGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .repCard { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .repCard .repTop { display: flex; justify-content: space-between; align-items: baseline; }
+  .repCard .repName { font-size: 18px; font-weight: 700; }
+  .repCard .repTotal { font-size: 28px; font-weight: 700; margin: 6px 0 2px; }
+  .repCard .repSub { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .legRow { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+  .legRow .legInfo { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .legRow .legRight { text-align: right; white-space: nowrap; }
+  .openBtn { width: 100%; margin-top: 14px; padding: 10px; font-size: 14px; font-weight: 600; border-radius: 8px; border: 1px solid var(--accent); background: none; color: var(--accent); cursor: pointer; }
   .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
   .header h1 { font-size: 22px; margin: 0; }
   .asOf { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
@@ -98,7 +112,17 @@
   <div id="loginError"></div>
 </div>
 
+<div id="adminView" class="wrap">
+  <div class="header">
+    <h1>Ambassador overview</h1>
+    <button class="logout" onclick="logout()">Log out</button>
+  </div>
+  <div class="asOf" id="adminAsOf"></div>
+  <div class="adminGrid" id="adminGrid"></div>
+</div>
+
 <div id="dashboard" class="wrap">
+  <button class="backLink" id="backBtn" onclick="showOverview()">← Back to overview</button>
   <div class="header">
     <h1 id="repName">—</h1>
     <button class="logout" onclick="logout()">Log out</button>
@@ -161,6 +185,8 @@
         btn.disabled = false;
         btn.textContent = 'View My Dashboard';
         if (resp.error) { errEl.textContent = resp.error; return; }
+        if (resp.admin) { adminData = resp.reps; showOverview(); return; }
+        adminData = null;
         renderDashboard(resp.rep, resp.data);
       })
       .catch(function () {
@@ -174,9 +200,54 @@
     if (e.key === 'Enter') login();
   });
 
+  // ---- Admin overview (Matt's login only; the server sends both reps) ----
+  let adminData = null;
+
+  function legStatus(d) {
+    const L1 = d.leg1, L2 = d.leg2, L3 = d.leg3;
+    return [
+      { name: 'Leg 1 · Sales', amt: L1.earned,
+        info: L1.remaining > 0 ? money(L1.remaining) + ' to cross ' + money(d.floor.floor) + ' floor' : 'Unlocked · ' + money(L1.qualifying) + ' vs ' + money(d.floor.floor) + ' floor' },
+      { name: 'Leg 2 · Education', amt: L2.earned,
+        info: L2.count + ' of ' + L2.bar + ' activations · ' + money(L2.paid, true) + ' paid' },
+      { name: 'Leg 3 · Growth', amt: L3.earned,
+        info: L3.active + ' active (net ' + (L3.netNew > 0 ? '+' : '') + L3.netNew + ') · retained ' + L3.retained + ' of ' + L3.base }
+    ];
+  }
+
+  function showOverview() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('adminView').style.display = 'block';
+    window.scrollTo(0, 0);
+
+    const names = Object.keys(adminData);
+    const asOf = names.length ? adminData[names[0]].asOf : '';
+    document.getElementById('adminAsOf').textContent = 'Updated ' + asOf;
+
+    document.getElementById('adminGrid').innerHTML = names.map(function (rep) {
+      const d = adminData[rep];
+      const legs = legStatus(d).map(function (l) {
+        return '<div class="legRow"><div><div>' + l.name + '</div><div class="legInfo">' + l.info + '</div></div>' +
+          '<div class="legRight">' + money(l.amt) + '</div></div>';
+      }).join('');
+      return '<div class="repCard"><div class="repTop"><span class="repName">' + escapeHtml(rep) + '</span>' +
+        '<span class="pill ' + (d.gate.met ? 'done' : 'wait') + '">Gate ' + (d.gate.met ? 'met' : 'not met') + '</span></div>' +
+        '<div class="repTotal">' + money(d.total) + '</div><div class="repSub">Bonus standing today · floor ' + money(d.floor.floor) + '</div>' +
+        legs + '<button class="openBtn" onclick="openRep(\'' + rep.replace(/'/g, "\\'") + '\')">Open ' + escapeHtml(rep) + '’s dashboard</button></div>';
+    }).join('');
+  }
+
+  function openRep(rep) {
+    renderDashboard(rep, adminData[rep]);
+    window.scrollTo(0, 0);
+  }
+
   function renderDashboard(rep, d) {
     document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminView').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('backBtn').style.display = adminData ? 'block' : 'none';
     document.getElementById('repName').textContent = rep + '’s Dashboard';
     document.getElementById('asOf').textContent = 'Updated ' + d.asOf;
 
@@ -303,6 +374,8 @@
   }
 
   function logout() {
+    adminData = null;
+    document.getElementById('adminView').style.display = 'none';
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'block';
     document.getElementById('passwordInput').value = '';
